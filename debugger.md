@@ -1,5 +1,5 @@
-﻿#Instructions for setting up the .NET Core debugger
-This page gives you detailed instructions on how to debug code running under .NET Core in VS Code. 
+﻿#Instructions for setting up the .NET Core debugger using daily builds
+This page gives you detailed instructions on how to debug code running under .NET Core in VS Code using daily builds of the C# extension and .NET CLI. You should expect most things to work, but these are daily builds. **Sometimes there will be bumps in the road.**
 
 ####Your Feedback​
 File bugs and feature requests [here](https://github.com/OmniSharp/omnisharp-vscode/issues) and [join our insiders group](http://landinghub.visualstudio.com/dotnetcoreinsiders) to help us build great tooling for .NET Core.
@@ -19,14 +19,58 @@ If you are not sure what version you have, you can see your version of VS Code:
 * **Windows / Linux:** Help->Abort
 
 ##### 2: Install .NET command line tools
-Install the .NET Core command line tools (CLI) by following the installation part of the instructions here: http://dotnet.github.io/getting-started
 
-**OSX:** .NET Core requires openSSL to work. Don't forget this! Execute: `brew install openssl`
+---
+
+**OSX**
+
+If you have previously installed, remove old versions --
+
+    sudo rm -rf /usr/local/share/dotnet
+
+Download and install: https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-osx-x64.latest.pkg
+
+Install OpenSSL:
+
+    brew install openssl
+
+---
+
+**Windows**
+
+Uninstall: Go to Control Panel->Add or remove programs, search for '.NET Core CLI' and uninstall.
+
+Download and install: https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x64.latest.exe
+
+---
+
+**Ubuntu**
+
+One time only - add the .NET Core feed to apt-get
+
+    sudo sh -c 'echo "deb [arch=amd64] http://apt-mo.trafficmanager.net/repos/dotnet/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list' 
+    sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+
+Uninstall old versions:
+
+    sudo sudo apt-get remove dotnet-sharedframework-microsoft.netcore.app dotnet-dev-1.0.0 dotnet-host
+
+Find the current version:
+
+    sudo apt-get update
+    apt-cache policy dotnet-dev-1.0.0-rc2 | grep dotnet-dev-1.0.0-rc2-00 | sort | tail -1
+
+Install the newest:
+
+    sudo apt-get install dotnet-dev-1.0.0-rc2-<ver-number>
+
+---
 
 ##### 3: Install C# Extension for VS Code
-Open the command palette in VS Code (F1) and type "ext install C#" to trigger the installation of the extension. VS Code will show a message that the extension has been installed and it will restart.
 
-If you have previously installed the C# extension, make sure that you have version 1.0.0-rc2 or newer. You can check this by opening the command palette (F1) and running 'Extensions: Show Installed Extensions'.
+* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.1-rc/csharp-1.0.1-rc2.vsix and download the extension.
+* Start VS Code
+* File->Open and open the downloaded vsix file
 
 ##### 4: Wait for download of platform-specific files 
 The first time that C# code is opened in VS Code, the extension will download the platform-specific files needed for debugging and editing. Debugging and editor features will not work until these steps finish.
@@ -42,9 +86,26 @@ You can start from scratch by creating an empty project with `dotnet new`:
     mkdir MyApplication
     cd MyApplication
     dotnet new
+    
+Open the project.json and change the 'Microsoft.NETCore.App' version to 'rc2-24008'
+Verify that worked by doing:
+
     dotnet restore
 
 You can also find some example projects on https://github.com/aspnet/cli-samples
+
+**If dotnet restore fails**: Depending on what build you are using, dotnet restore may fail because dotnet new referenced a package which is on myget.org, but didn't create a NuGet.Config file. If so, create a NuGet.Config file in the project directory with the following content:
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <configuration>
+      <packageSources>
+        <!--To inherit the global NuGet package sources remove the <clear/> line below -->
+        <clear />
+        <add key="dotnet-core" value="https://www.myget.org/F/dotnet-core/api/v3/index.json" />
+        <add key="api.nuget.org" value="https://api.nuget.org/v3/index.json" />
+      </packageSources>
+    </configuration>
+
 
 ##### 2: Open the directory in VS Code
 Go to File->Open and open the directory in Visual Studio Code. If this is the first time that the C# extension has been activated, it will now download additional platform-specific dependencies.
