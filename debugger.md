@@ -20,9 +20,6 @@ If you are not sure what version you have, you can see your version of VS Code:
 
 ##### 2: Install .NET command line tools
 
-###NOTE: Builds from Tuesday 4/12+ seem to be broken. 
-The issue is under investigation see https://github.com/OmniSharp/omnisharp-vscode/issues/181 
-
 ---
 
 **OSX**
