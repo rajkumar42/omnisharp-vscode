@@ -53,7 +53,7 @@ One time only - add the .NET Core feed to apt-get
 
 Uninstall old versions:
 
-    sudo sudo apt-get remove dotnet-sharedframework-microsoft.netcore.app dotnet-dev-1.0.0 dotnet-host
+    sudo apt-get remove dotnet-sharedframework-microsoft.netcore.app dotnet-dev-1.0.0 dotnet-host
 
 Find the current version:
 
@@ -66,9 +66,24 @@ Install the newest:
 
 ---
 
+**Other Linux distros with no installers for .NET command line tools (CentOS / RHEL)**
+
+Go to https://github.com/dotnet/cli and find the ".NET Core SDK Binaries" download link for your distribution
+
+Extract the downloaded archive into a folder on your machine
+
+Add 'dotnet' executable to your PATH as the debugger in C# extension needs to locate it. You can do this via:
+    
+    echo "export PATH=<the downloaded folder path>:\$PATH" | sudo tee /etc/profile.d/setdotnetpath.sh
+    sudo chmod +x /etc/profile.d/setdotnetpath.sh
+
+Log out and log back in for the changes to take effect
+
+---
+
 ##### 3: Install C# Extension for VS Code
 
-* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.1-rc/csharp-1.0.1-rc2.vsix and download the extension.
+* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.3-rc2/csharp-1.0.3-rc2.vsix and download the extension.
 * Start VS Code
 * File->Open and open the downloaded vsix file
 
