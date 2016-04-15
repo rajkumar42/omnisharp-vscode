@@ -68,7 +68,7 @@ Install the newest:
 
 **Other Linux distros with no installers for .NET command line tools (CentOS / RHEL)**
 
-Go to https://github.com/dotnet/cli and find the ".NET Core SDK Binaries" download link for your distribution
+Go to the [.NET CLI GitHub project](https://github.com/dotnet/cli#installers-and-binaries) and find the ".NET Core SDK Binaries" download link for your distribution
 
 Extract the downloaded archive into a folder on your machine
 
