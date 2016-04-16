@@ -63,6 +63,7 @@ Find the current version:
 Install the newest:
 
     sudo apt-get install dotnet-dev-1.0.0-rc2-<ver-number>
+    sudo apt-get install dotnet-host=1.0.0-rc2-<ver-number>-1
 
 ---
 
