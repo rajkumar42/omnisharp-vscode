@@ -88,6 +88,8 @@ Log out and log back in for the changes to take effect
 * Start VS Code
 * File->Open and open the downloaded vsix file
 
+NOTE: Do NOT try and double click the extension from Windows Explorer/Finder/etc. That will NOT work.
+
 ##### 4: Wait for download of platform-specific files 
 The first time that C# code is opened in VS Code, the extension will download the platform-specific files needed for debugging and editing. Debugging and editor features will not work until these steps finish.
 
