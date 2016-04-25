@@ -83,7 +83,7 @@ Log out and log back in for the changes to take effect
 
 ##### 3: Install C# Extension for VS Code
 
-* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.3-rc2/csharp-1.0.3-rc2.vsix and download the extension.
+* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.4-rc2/csharp-1.0.4-rc2.vsix and download the extension.
 * Start VS Code
 * File->Open and open the downloaded vsix file
 
