@@ -63,7 +63,6 @@ Find the current version:
 Install the newest:
 
     sudo apt-get install dotnet-dev-1.0.0-rc2-<ver-number>
-    sudo apt-get install dotnet-host=1.0.0-rc2-<ver-number>-1
 
 ---
 
@@ -124,6 +123,7 @@ You can also find some example projects on https://github.com/aspnet/cli-samples
       </packageSources>
     </configuration>
 
+In addition to this, sometimes 'dotnet new' will reference a version of Microsoft.NETCore.App which hasn't been published yet. If so, you can change the 'version' to '1.0.0-rc2-*'. When you do this make sure that the restore didn't pick up some really old build. For context, 3002485 is the current build as of 4/25.
 
 ##### 2: Open the directory in VS Code
 Go to File->Open and open the directory in Visual Studio Code. If this is the first time that the C# extension has been activated, it will now download additional platform-specific dependencies.
