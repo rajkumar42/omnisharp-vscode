@@ -103,10 +103,6 @@ You can start from scratch by creating an empty project with `dotnet new`:
     mkdir MyApplication
     cd MyApplication
     dotnet new
-    
-Open the project.json and change the 'Microsoft.NETCore.App' version to 'rc2-24008'
-Verify that worked by doing:
-
     dotnet restore
 
 You can also find some example projects on https://github.com/aspnet/cli-samples
