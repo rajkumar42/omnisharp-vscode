@@ -58,11 +58,11 @@ Uninstall old versions:
 Find the current version:
 
     sudo apt-get update
-    apt-cache policy dotnet-dev-1.0.0-rc2 | grep dotnet-dev-1.0.0-rc2-00 | sort | tail -1
+    apt-cache policy dotnet-dev-1.0.0-preview1 | grep dotnet-dev-1.0.0-preview1 | sort | tail -1
 
 Install the newest:
 
-    sudo apt-get install dotnet-dev-1.0.0-rc2-<ver-number>
+    sudo apt-get install dotnet-dev-1.0.0-preview1-<ver-number>
 
 ---
 
