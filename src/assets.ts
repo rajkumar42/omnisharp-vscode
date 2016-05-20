@@ -260,7 +260,7 @@ function addLaunchJsonIfNecessary(info: protocol.DotNetWorkspaceInformation, pat
         let done = false;
         for (var project of info.Projects) {
             for (var configuration of project.Configurations) {
-                if (configuration.Name === "Debug" && configuration.EmitEntryPoint === true) {                       
+                if (configuration.Name === "Debug" && configuration.EmitEntryPoint === true) {
                     if (project.Frameworks.length > 0) {
                         targetFramework = project.Frameworks[0].ShortName;
                         executableName = path.basename(configuration.CompilationOutputAssemblyFile)
@@ -269,17 +269,95 @@ function addLaunchJsonIfNecessary(info: protocol.DotNetWorkspaceInformation, pat
                     done = true;
                     break;
                 }
-            }               
+            }
+            
+            if (done) {
+                break;
+            }
+        }
+
+        if (fs.existsSync(launchJson)) {
+            return false; // error message in the console?
+        }
+        
+        // TODO: intermediate checkin. timeboxed.
+        var launchJson = JSON.parse(fs.readFileSync(launchJson));
+        launchJson.configurations
+        
+        // const launchJson = createLaunchJson(targetFramework, executableName, hasWebServerDependency(projectJsonPath));
+        const launchJsonText = JSON.stringify(launchJson, null, '    ');
+        
+        return fs.writeFileAsync(paths.launchJsonPath, launchJsonText);
+    });
+}
+
+function addLaunch(info: protocol.DotNetWorkspaceInformation, paths: Paths, operations: Operations, launchType: string) {
+    return new Promise<void>((resolve, reject) => {
+        if (!operations.addLaunchJson) {
+            return resolve();
+        }
+        
+        let targetFramework = '<target-framework>';
+        let executableName = '<project-name.dll>';
+        
+        let isWeb = false;
+        if (launchType == "web") {
+            isWeb = true;
+        }
+
+        let done = false;
+        for (var project of info.Projects) {
+            for (var configuration of project.Configurations) {
+                if (configuration.Name === "Debug" && configuration.EmitEntryPoint === true) {
+                    if (project.Frameworks.length > 0) {
+                        targetFramework = project.Frameworks[0].ShortName;
+                        executableName = path.basename(configuration.CompilationOutputAssemblyFile)
+                    }
+                    
+                    done = true;
+                    break;
+                }
+            }
             
             if (done) {
                 break;
             }
         }
         
-        const launchJson = createLaunchJson(targetFramework, executableName, hasWebServerDependency(projectJsonPath));
+        const launchJson = createLaunchJson(targetFramework, executableName, isWeb);
         const launchJsonText = JSON.stringify(launchJson, null, '    ');
         
         return fs.writeFileAsync(paths.launchJsonPath, launchJsonText);
+    });
+}
+
+function addLaunchIfApplicable(server: OmnisharpServer, launchType: string) {
+    if (!vscode.workspace.rootPath) {
+        return;
+    }
+    
+    const projectJsonPath = path.join(vscode.workspace.rootPath, 'project.json');
+    if (!fs.existsSync(projectJsonPath)) {
+        return;
+    }
+    
+    return serverUtils.requestWorkspaceInformation(server).then(info => {
+        // If there are no .NET Core projects, we won't bother offering to add configuration to assets.
+        if ('DotNet' in info && info.DotNet.Projects.length > 0) {
+            return getOperations().then(operations => {
+                if (!hasOperations(operations)) {
+                    return;
+                }
+                
+                const paths = getPaths();
+
+                return fs.ensureDirAsync(paths.vscodeFolder).then(() => {
+                    return Promise.all([
+                        addLaunch(info.DotNet, paths, operations, launchType)
+                    ]);
+                });
+            });
+        }
     });
 }
 
@@ -288,8 +366,8 @@ export function addAssetsIfNecessary(server: OmnisharpServer) {
         return;
     }
     
-    // If there is no project.json, we won't bother to prompt the user for tasks.json.		
-    const projectJsonPath = path.join(vscode.workspace.rootPath, 'project.json');		
+    // If there is no project.json, we won't bother to prompt the user for tasks.json.
+    const projectJsonPath = path.join(vscode.workspace.rootPath, 'project.json');
     if (!fs.existsSync(projectJsonPath)) {
         return;
     }

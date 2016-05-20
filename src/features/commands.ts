@@ -25,8 +25,11 @@ export default function registerCommands(server: OmnisharpServer, extensionPath:
     // register empty handler for csharp.installDebugger
     // running the command activates the extension, which is all we need for installation to kickoff
     let d5 = vscode.commands.registerCommand('csharp.downloadDebugger', () => { });
+	
+	let d6 = vscode.commands.registerCommand('csharp.addConsoleLaunch', () => { });
+	let d7 = vscode.commands.registerCommand('csharp.addWebLaunch', () => { });
     
-	return vscode.Disposable.from(d1, d2, d3, d4, d5);
+	return vscode.Disposable.from(d1, d2, d3, d4, d5, d6, d7);
 }
 
 function pickProjectAndStart(server: OmnisharpServer) {

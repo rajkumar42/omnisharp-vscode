@@ -50,6 +50,8 @@
     "onCommand:o.showOutput",
     "onCommand:dotnet.restore",
     "onCommand:csharp.downloadDebugger",
+    "onCommand:csharp.addConsoleLaunch",
+    "onCommand:csharp.addWebLaunch",
     "workspaceContains:project.json"
   ],
   "contributes": {
@@ -100,7 +102,17 @@
         "command": "csharp.downloadDebugger",
         "title": "Download .NET Core Debugger",
         "category": "Debug"
-      }
+      },
+      {
+        "command": "csharp.addConsoleLaunch",
+        "title": "Add Console Launch in Launch.json",
+        "category": "OmniSharp"
+      },
+      {
+        "command": "csharp.addWebLaunch",
+        "title": "Add Web Launch in Launch.json",
+        "category": "OmniSharp"
+      }      
     ],
     "keybindings": [
       {
