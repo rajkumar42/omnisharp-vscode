@@ -214,22 +214,19 @@ function createTasksConfiguration(): tasks.TaskConfiguration {
     return {
         version: '0.1.0',
         command: '',
+        isShellCommand: true,
         windows : {
             command: 'cmd',
             args : ['/c'],
-            isShellCommand: true
         },
         linux : {
             command: 'bash',
             args : ['-c'],
-            isShellCommand: true
         },
         osx : {
             command: 'sh',
             args : ['-c'],
-            isShellCommand: true
         },
-        isShellCommand: true,
         suppressTaskName: true,
         tasks: [ createBuildTaskDescription() ]
     };
@@ -287,7 +284,6 @@ function hasWebServerDependency(projectJsonPath: string) {
     let projectJson = fs.readFileSync(projectJsonPath, 'utf8');
     let projectJsonObject = JSON.parse(projectJson);
     if (projectJsonObject != null && projectJsonObject.dependencies != null) {
-        // TODO: janraj, wildcard Microsoft.AspNetCore.Server*
         return (projectJsonObject.dependencies["Microsoft.AspNetCore.Server.Kestrel"] != null)
     }
     
