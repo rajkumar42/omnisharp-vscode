@@ -57,7 +57,7 @@ export function activate(context: vscode.ExtensionContext, reporter: TelemetryRe
     
     writeInstallBeginFile().then(function() {
         installStage = 'writeProjectJson';
-        return writeProjectJson();
+        return writeProjectJson(_channel);
     }).then(function() {
         installStage = 'dotnetRestore'
         return spawnChildProcess('dotnet', ['--verbose', 'restore', '--configfile', 'NuGet.config'], _channel, _util.coreClrDebugDir())  
@@ -185,7 +185,7 @@ function removeLibCoreClrTraceProvider() : Promise<void>
                 if (err) {
                     reject(err.code);
                 } else {
-                    _channel.appendLine('Succesfully deleted ' + filePath);
+                    _channel.appendLine('Successfully deleted ' + filePath);
                     resolve();
                 }
             });
@@ -240,12 +240,16 @@ function ensureAd7EngineExists(channel: vscode.OutputChannel, outputDirectory: s
     });
 }
 
-function writeProjectJson(): Promise<void> {
-    return new Promise<void>(function(resolve, reject) {
-        var projectJson = createProjectJson(CoreClrDebugUtil.getPlatformRuntimeId());
+function writeProjectJson(channel: vscode.OutputChannel): Promise<void> {
+    return new Promise<void>(function (resolve, reject) {
+        const projectJsonPath = path.join(_util.coreClrDebugDir(), 'project.json');
+        _channel.appendLine('Creating ' + projectJsonPath);
+
+        const projectJson = createProjectJson(getPlatformRuntimeId(channel));
         
-        fs.writeFile(path.join(_util.coreClrDebugDir(), 'project.json'), JSON.stringify(projectJson, null, 2), {encoding: 'utf8'}, function(err) {
-           if (err) {
+        fs.writeFile(projectJsonPath, JSON.stringify(projectJson, null, 2), {encoding: 'utf8'}, function(err) {
+            if (err) {
+               channel.appendLine('Error: Unable to write to project.json: ' + err.message);
                reject(err.code);
            }
            else {
@@ -255,36 +259,101 @@ function writeProjectJson(): Promise<void> {
     });
 }
 
+function getPlatformRuntimeId(channel: vscode.OutputChannel) : string {
+    switch (process.platform) {
+        case 'win32':
+            return 'win7-x64';
+        case 'darwin':
+            return getDotnetRuntimeId(channel);
+        case 'linux':
+            return getDotnetRuntimeId(channel);
+        default:
+            channel.appendLine('Error: Unsupported platform ' + process.platform);
+            throw Error('Unsupported platform ' + process.platform);
+    }
+}
+    
+function getDotnetRuntimeId(channel: vscode.OutputChannel): string {
+    channel.appendLine("Starting 'dotnet --info'");
+
+    const cliVersionErrorMessage = "Ensure that .NET Core CLI Tools version >= 1.0.0-beta-002173 is installed. Run 'dotnet --version' to see what version is installed.";
+
+    let child = child_process.spawnSync('dotnet', ['--info'], { cwd: _util.coreClrDebugDir() });
+
+    if (child.stderr.length > 0) {
+        channel.append('Error: ' + child.stderr.toString());
+    }
+    const out = child.stdout.toString();
+    if (out.length > 0) {
+        channel.append(out);
+    }
+
+    if (child.status !== 0) {
+        const message = `Error: 'dotnet --info' failed with error ${child.status}`;
+        channel.appendLine(message);
+        channel.appendLine(cliVersionErrorMessage);
+        throw new Error(message);
+    }
+
+    if (out.length === 0) {
+        const message = "Error: 'dotnet --info' provided no output";
+        channel.appendLine(message);
+        channel.appendLine(cliVersionErrorMessage);
+        throw new Error(message);
+    }
+
+    let lines = out.split('\n');
+    let ridLine = lines.filter(function (value) {
+        return value.trim().startsWith('RID:');
+    });
+
+    if (ridLine.length < 1) {
+        channel.appendLine("Error: Cannot find 'RID' property");
+        channel.appendLine(cliVersionErrorMessage);
+        throw new Error('Cannot obtain Runtime ID from dotnet cli');
+    }
+
+    let rid = ridLine[0].split(':')[1].trim();
+
+    if (!rid) {
+        channel.appendLine("Error: Unable to parse 'RID' property.");
+        channel.appendLine(cliVersionErrorMessage);
+        throw new Error('Unable to determine Runtime ID');
+    }
+
+    return rid;
+}
+
 function createProjectJson(targetRuntime: string): any
 {
     let projectJson = {
         name: "dummy",
-        compilationOptions: {
+        buildOptions: {
             emitEntryPoint: true
         },
         dependencies: {
-            "Microsoft.VisualStudio.clrdbg": "14.0.25208-preview-2924185",
+            "Microsoft.VisualStudio.clrdbg": "14.0.25229-preview-2963841",
             "Microsoft.VisualStudio.clrdbg.MIEngine": "14.0.30401-preview-1",
             "Microsoft.VisualStudio.OpenDebugAD7": "1.0.20405-preview-1",
-            "NETStandard.Library": "1.5.0-rc2-24008",
+            "NETStandard.Library": "1.5.0-rc2-24027",
             "Newtonsoft.Json": "7.0.1",
             "Microsoft.VisualStudio.Debugger.Interop.Portable": "1.0.1",
-            "System.Collections.Specialized":  "4.0.1-rc2-24008",
-            "System.Collections.Immutable": "1.2.0-rc2-24008", 
-            "System.Diagnostics.Process" : "4.1.0-rc2-24008",
-            "System.Diagnostics.StackTrace":  "4.0.1-rc2-24008",  
-            "System.Dynamic.Runtime": "4.0.11-rc2-24008",
-            "Microsoft.CSharp": "4.0.1-rc2-24008",
-            "System.Threading.Tasks.Dataflow": "4.6.0-rc2-24008",
-            "System.Threading.Thread": "4.0.0-rc2-24008", 
-            "System.Xml.XDocument": "4.0.11-rc2-24008",
-            "System.Xml.XmlDocument": "4.0.1-rc2-24008",  
-            "System.Xml.XmlSerializer": "4.0.11-rc2-24008",
-            "System.ComponentModel":  "4.0.1-rc2-24008",  
-            "System.ComponentModel.Annotations":  "4.1.0-rc2-24008",  
-            "System.ComponentModel.EventBasedAsync":  "4.0.11-rc2-24008",
-            "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24008",
-            "System.Net.Http":  "4.0.1-rc2-24008"
+            "System.Collections.Specialized":  "4.0.1-rc2-24027",
+            "System.Collections.Immutable": "1.2.0-rc2-24027", 
+            "System.Diagnostics.Process" : "4.1.0-rc2-24027",
+            "System.Diagnostics.StackTrace":  "4.0.1-rc2-24027",  
+            "System.Dynamic.Runtime": "4.0.11-rc2-24027",
+            "Microsoft.CSharp": "4.0.1-rc2-24027",
+            "System.Threading.Tasks.Dataflow": "4.6.0-rc2-24027",
+            "System.Threading.Thread": "4.0.0-rc2-24027", 
+            "System.Xml.XDocument": "4.0.11-rc2-24027",
+            "System.Xml.XmlDocument": "4.0.1-rc2-24027",  
+            "System.Xml.XmlSerializer": "4.0.11-rc2-24027",
+            "System.ComponentModel":  "4.0.1-rc2-24027",  
+            "System.ComponentModel.Annotations":  "4.1.0-rc2-24027",  
+            "System.ComponentModel.EventBasedAsync":  "4.0.11-rc2-24027",
+            "System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027",
+            "System.Net.Http":  "4.0.1-rc2-24027"
         },
         frameworks: {
             "netstandardapp1.5": {
