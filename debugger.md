@@ -28,7 +28,7 @@ If you have previously installed, remove old versions --
 
     sudo rm -rf /usr/local/share/dotnet
 
-Download and install: https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-osx-x64.latest.pkg
+Download and install: https://dotnetcli.blob.core.windows.net/dotnet/preview/Installers/Latest/dotnet-dev-osx-x64.latest.pkg
 
 Install OpenSSL:
 
@@ -40,29 +40,15 @@ Install OpenSSL:
 
 Uninstall: Go to Control Panel->Add or remove programs, search for '.NET Core CLI' and uninstall.
 
-Download and install: https://dotnetcli.blob.core.windows.net/dotnet/beta/Installers/Latest/dotnet-dev-win-x64.latest.exe
+Download and install: https://dotnetcli.blob.core.windows.net/dotnet/preview/Installers/Latest/dotnet-dev-win-x64.latest.exe
 
 ---
 
 **Ubuntu**
 
-One time only - add the .NET Core feed to apt-get
-
-    sudo sh -c 'echo "deb [arch=amd64] http://apt-mo.trafficmanager.net/repos/dotnet/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list' 
-    sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
-
-Uninstall old versions:
-
-    sudo apt-get remove dotnet-sharedframework-microsoft.netcore.app dotnet-dev-1.0.0 dotnet-host
-
-Find the current version:
-
-    sudo apt-get update
-    apt-cache policy dotnet-dev-1.0.0-preview1 | grep dotnet-dev-1.0.0-preview1 | sort | tail -1
-
-Install the newest:
-
-    sudo apt-get install dotnet-dev-1.0.0-preview1-<ver-number>
+* Uninstall old versions with `sudo apt-get remove dotnet-sharedframework-microsoft.netcore.app dotnet-dev-1.0.0 dotnet-host`
+* Download the installers from https://github.com/dotnet/cli#ubuntu-installers
+* Double click the deb files
 
 ---
 
@@ -83,7 +69,7 @@ Log out and log back in for the changes to take effect
 
 ##### 3: Install C# Extension for VS Code
 
-* Go to https://github.com/OmniSharp/omnisharp-vscode/releases/download/v1.0.5-rc2/csharp-1.0.5-rc2.vsix and download the extension.
+* Go to https://github.com/OmniSharp/omnisharp-vscode/releases and download the latest .vsix file
 * Start VS Code
 * File->Open and open the downloaded vsix file
 
