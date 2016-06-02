@@ -20,6 +20,10 @@ If you are not sure what version you have, you can see your version of VS Code:
 
 ##### 2: Install .NET command line tools
 
+*Released builds:* If you want to use the last released version of the .NET Core runtime and tools, follow the installation part of the instructions here: https://www.microsoft.com/net/core
+
+*Daily builds*: If you want to install daily builds of the .NET CLI, keep going with these steps.
+
 ---
 
 **OSX**
